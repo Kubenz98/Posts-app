@@ -2,8 +2,10 @@
 
 class Users extends Controller
 {
+  private $userModel;
   public function __construct()
   {
+    $this->userModel = $this->model('User');
   }
   public function register()
   {
@@ -21,33 +23,36 @@ class Users extends Controller
         'password_err' => '',
         'confrim_password_err' => ''
       ];
-      if(empty($data['email'])) {
+      if (empty($data['email'])) {
         $data['email_err'] = 'Please enter email';
+      } else {
+        if ($this->userModel->findUserByEmail($data['email'])) {
+          $data['email_err'] = 'Email is already taken';
+        }
       }
-      
-      if(empty($data['name'])) {
+
+      if (empty($data['name'])) {
         $data['name_err'] = 'Please enter name';
       }
-      
-      if(empty($data['password'])) {
+
+      if (empty($data['password'])) {
         $data['password_err'] = 'Please enter password';
-      } elseif(strlen($data['password']) < 6) {
+      } elseif (strlen($data['password']) < 6) {
         $data['password_err'] = 'Password must be at least 6 characters';
       }
-            
-      if(empty($data['confirm_password'])) {
+
+      if (empty($data['confirm_password'])) {
         $data['confirm_password_err'] = 'Please confrim password';
       } else {
-        if($data['password'] !== $data['confirm_password']) {
+        if ($data['password'] !== $data['confirm_password']) {
           $data['confirm_password_err'] = 'Passwords do not match';
         }
       }
-      if(empty($data['email_err']) && empty($data['name_err']) && empty($data['password_err']) && empty($data['confirm_password_err'])) {
+      if (empty($data['email_err']) && empty($data['name_err']) && empty($data['password_err']) && empty($data['confirm_password_err'])) {
         die("Success");
       } else {
         $this->view('users/register', $data);
       }
-
     } else {
       $data = [
         'name' => '',
@@ -72,19 +77,18 @@ class Users extends Controller
         'password_err' => '',
       ];
 
-      if(empty($data['email'])) {
+      if (empty($data['email'])) {
         $data['email_err'] = 'Please enter email';
       }
-      if(empty($data['password'])) {
+      if (empty($data['password'])) {
         $data['password_err'] = 'Please enter password';
       }
 
-      if(empty($data['email_err']) && empty($data['password_err'])) {
+      if (empty($data['email_err']) && empty($data['password_err'])) {
         die("success");
       } else {
         $this->view('users/login', $data);
       }
-
     } else {
       $data = [
         'email' => '',
