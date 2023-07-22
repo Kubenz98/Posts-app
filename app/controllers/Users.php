@@ -48,8 +48,18 @@ class Users extends Controller
           $data['confirm_password_err'] = 'Passwords do not match';
         }
       }
+
       if (empty($data['email_err']) && empty($data['name_err']) && empty($data['password_err']) && empty($data['confirm_password_err'])) {
-        die("Success");
+      
+        $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
+        if($this->userModel->registerUser($data['name'], $data['email'], $hashedPassword)) {
+          flash('register_success', 'You are registered and can log in');
+          redirect('users/login');
+        } else {
+          die('Something went wrong');
+        }
+
+
       } else {
         $this->view('users/register', $data);
       }
@@ -67,6 +77,7 @@ class Users extends Controller
       $this->view('users/register', $data);
     }
   }
+
   public function login()
   {
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
