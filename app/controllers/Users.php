@@ -79,6 +79,9 @@ class Users extends Controller
   public function login()
   {
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+      $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_SPECIAL_CHARS);
+
       $data = [
         'email' => trim($_POST['email']),
         'password' => trim($_POST['password']),
@@ -94,7 +97,7 @@ class Users extends Controller
       }
 
       if (!$this->userModel->findUserByEmail($data['email'])) {
-        $data['email_err'] = 'No user found';
+        $data['email_err'] = 'Invalid email';
       }
 
       if (empty($data['email_err']) && empty($data['password_err'])) {
@@ -106,6 +109,8 @@ class Users extends Controller
           $data['password_err'] = 'Password incorrect';
           $this->view('users/login', $data);
         }
+      } else {
+        $this->view('users/login', $data);
       }
     } else {
       $data = [
